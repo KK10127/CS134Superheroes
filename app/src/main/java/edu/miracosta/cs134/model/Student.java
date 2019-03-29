@@ -24,7 +24,7 @@ public class Student {
      * @param oneThing
      */
     public Student(String fileName, String name, String superPower, String oneThing) {
-        mFileName = name;
+        mFileName = fileName;
         mName = name;
         mSuperPower = superPower;
         mOneThing = oneThing;

@@ -34,7 +34,7 @@ public class JSONLoader {
 
         try {
             JSONObject jsonRootObject = new JSONObject(json);
-            JSONArray allStudentsJSON = jsonRootObject.getJSONArray("Students");
+            JSONArray allStudentsJSON = jsonRootObject.getJSONArray("CS134Superheroes");
 
             // Loop through all the students in the JSON data, create a student
             int length = allStudentsJSON.length();
@@ -47,11 +47,13 @@ public class JSONLoader {
                 // extract the info
                 fileName = studentJSON.getString("FileName");
                 name = studentJSON.getString("Name");
-                superPower = studentJSON.getString("SuperPower");
+                superPower = studentJSON.getString("Superpower");
                 oneThing = studentJSON.getString("OneThing");
 
                 // create object and add to the list
                 student = new Student(fileName, name, superPower, oneThing);
+
+                Log.d("JSON Loader", "Created student: " + student.toString());
                 allStudentsList.add(student);
             }
         } catch (JSONException e) {
@@ -59,6 +61,7 @@ public class JSONLoader {
         }
 
         // return the list
+        Log.d("JSON Loader", "Returning list: " + allStudentsList.toString());
         return allStudentsList;
     }
 
