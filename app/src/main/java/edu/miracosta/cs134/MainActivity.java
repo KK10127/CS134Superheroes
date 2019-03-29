@@ -28,6 +28,12 @@ import java.util.List;
 import edu.miracosta.cs134.model.JSONLoader;
 import edu.miracosta.cs134.model.Student;
 
+/**
+ * Main activity for the superheroes quiz.
+ *
+ * @author Jay Montoya
+ * @version 1.0
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Superheroe Quiz!";
@@ -47,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mQuestionNumberTextView;       // shows the current question number
     private ImageView mStudentImageView;            // displays a student
     private TextView mAnswerTextView;               // displays correct answer
+    private TextView mGuessStudentTextView;
 
     SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener =
             new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -58,10 +65,8 @@ public class MainActivity extends AppCompatActivity {
                         case PREF_QUIZ_TYPE: // constant that stores "pref_quizType" to match
                             mQuizType = sharedPreferences.getString(PREF_QUIZ_TYPE, mQuizType);
 
-                            Log.e("Quiz type updated!", "Updated to " + mQuizType);
+                            Log.d("Quiz type updated!", "Updated to " + mQuizType);
 
-
-                            //TODO: only reset the quiz if it was changed
                             resetQuiz();
 
                             break;
@@ -101,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         mQuestionNumberTextView = findViewById(R.id.questionNumberTextView);
         mStudentImageView = findViewById(R.id.studentImageView);
         mAnswerTextView = findViewById(R.id.answerTextView);
+        mGuessStudentTextView = findViewById(R.id.guessStudentTextView);
 
         // put all 4 butons in the array (mButtons)
         mButtons[0] = findViewById(R.id.button);
@@ -109,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         mButtons[3] = findViewById(R.id.button4);
 
         // set mQuestionNumberTextView's text to the appropriate strings.xml resource
-        mQuestionNumberTextView.setText("Question {1} of {10}");
+        mQuestionNumberTextView.setText(getResources().getString(R.string.question, (mCorrectGuesses + 1) , STUDENTS_IN_QUIZ));
 
         // load all the countries from the JSON file using the JSONLoader
         try {
@@ -148,20 +154,26 @@ public class MainActivity extends AppCompatActivity {
 
         // Lets set the text of the 4 buttons to the first 4 superpowers
         // names, or "one thing"s
-        // TODO: Implement this using the settings we configure
+        // DONE: Implement this using the settings we configure
         for (int i = 0; i < mButtons.length; i++) {
             mButtons[i].setText(getStringFromQuizType(mQuizStudentsList.get(i)));
         }
 
+        // change the "guess the [BLANK]" part
+        switch(mQuizType) {
+            case "One Thing":
+                mGuessStudentTextView.setText(R.string.guess_thing);
+                break;
+            case "Superhero Name":
+                mGuessStudentTextView.setText(R.string.guess_hero);
+                break;
+            case "Superpower":
+                mGuessStudentTextView.setText(R.string.guess_power);
+                break;
+        }
+
         // start the quiz by calling loadNextStudent
         loadNextStudent();
-    }
-
-    /**
-     *
-     */
-    private void updateBasedOnQuizType() {
-        return;
     }
 
     private String getStringFromQuizType(Student student) {

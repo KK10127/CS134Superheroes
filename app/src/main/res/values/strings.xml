@@ -16,4 +16,6 @@
    <string name="image_description">Image of the current flag in the quiz</string>
    <string name="default_region">North_America</string>
    <string name="title_activity_settings">Settings</string>
+   <string name="guess_power">Guess the power!</string>
+   <string name="guess_thing">Guess the \"one thing!\"</string>
 </resources>

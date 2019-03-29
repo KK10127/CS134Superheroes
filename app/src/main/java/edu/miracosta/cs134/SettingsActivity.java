@@ -6,6 +6,9 @@ import android.os.Bundle;
 
 import java.util.Objects;
 
+/**
+ * Class needed to implement the different quiz-types in this app.
+ */
 public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

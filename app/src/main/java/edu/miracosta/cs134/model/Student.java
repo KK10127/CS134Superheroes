@@ -18,10 +18,10 @@ public class Student {
 
     /**
      * Instatiates a new <code>Student</code> given its name and region.
-     * @param fileName
-     * @param name
-     * @param superPower
-     * @param oneThing
+     * @param fileName The file name of the picture.
+     * @param name Superhero's name
+     * @param superPower super power
+     * @param oneThing one fact
      */
     public Student(String fileName, String name, String superPower, String oneThing) {
         mFileName = fileName;
@@ -30,22 +30,42 @@ public class Student {
         mOneThing = oneThing;
     }
 
+    /**
+     * Getter method for the file name
+     * @return the file name as a string
+     */
     public String getFileName() {
         return mFileName;
     }
 
+    /**
+     * Getter method for the name
+     * @return the name as a string
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * Getter method for the superpower
+     * @return the superpower as a string
+     */
     public String getSuperPower() {
         return mSuperPower;
     }
 
+    /**
+     * Getter method for the one thing
+     * @return the "one thing" as a string
+     */
     public String getOneThing() {
         return mOneThing;
     }
 
+    /**
+     * toString method
+     * @return meaningful representation of this objects data as a string
+     */
     @Override
     public String toString() {
         return "Student{" +
