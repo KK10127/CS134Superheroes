@@ -7,5 +7,5 @@
         android:title="@string/quiz_type"
         android:summary="@string/summary"
         android:persistent="true"
-        android:defaultValue="One Thing" />
+        android:defaultValue="Superhero Name" />
 </PreferenceScreen>

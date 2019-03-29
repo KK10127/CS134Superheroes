@@ -2,9 +2,11 @@ package edu.miracosta.cs134;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Superheroe Quiz!";
     private static final int STUDENTS_IN_QUIZ = 10;
+    public static final String PREF_QUIZ_TYPE = "pref_quizType";
 
     private Button[] mButtons = new Button[4];
     private List<Student> mAllStudentsList;         // all the students loaded from JSON
@@ -39,10 +42,32 @@ public class MainActivity extends AppCompatActivity {
     private int mCorrectGuesses;                    // number of correct guesses made
     private SecureRandom rng; // used to randomize the quiz
     private Handler handler; // used to delay loading the next student
+    private String mQuizType = "Superhero Name";
 
     private TextView mQuestionNumberTextView;       // shows the current question number
     private ImageView mStudentImageView;            // displays a student
     private TextView mAnswerTextView;               // displays correct answer
+
+    SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String
+                        key) {
+                    switch (key)
+                    {
+                        case PREF_QUIZ_TYPE: // constant that stores "pref_quizType" to match
+                            mQuizType = sharedPreferences.getString(PREF_QUIZ_TYPE, mQuizType);
+
+                            Log.e("Quiz type updated!", "Updated to " + mQuizType);
+
+
+                            //TODO: only reset the quiz if it was changed
+                            resetQuiz();
+
+                            break;
+                    }
+                }
+            };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -61,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
+
 
         mQuizStudentsList = new ArrayList<>(STUDENTS_IN_QUIZ);
         rng = new SecureRandom();
@@ -106,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         int randomPosition;
         Student randomStudent;
         while(mQuizStudentsList.size() <= STUDENTS_IN_QUIZ) {
-            Log.e(TAG, "Calling RNG with size: " + size);
+            //Log.e(TAG, "Calling RNG with size: " + size);
             randomPosition = rng.nextInt(size);
             randomStudent = mAllStudentsList.get(randomPosition);
 
@@ -119,12 +150,34 @@ public class MainActivity extends AppCompatActivity {
         // names, or "one thing"s
         // TODO: Implement this using the settings we configure
         for (int i = 0; i < mButtons.length; i++) {
-            mButtons[i].setText(mQuizStudentsList.get(i).getName());
+            mButtons[i].setText(getStringFromQuizType(mQuizStudentsList.get(i)));
         }
 
         // start the quiz by calling loadNextStudent
         loadNextStudent();
     }
+
+    /**
+     *
+     */
+    private void updateBasedOnQuizType() {
+        return;
+    }
+
+    private String getStringFromQuizType(Student student) {
+        switch(mQuizType) {
+            case "One Thing":
+                return student.getOneThing();
+            case "Superhero Name":
+                return student.getName();
+            case "Superpower":
+                return student.getSuperPower();
+
+        }
+        return "";
+    }
+
+
 
     /**
      * Method initiates the proccess of loading the next flag for the quiz, showing
@@ -139,7 +192,8 @@ public class MainActivity extends AppCompatActivity {
         mAnswerTextView.setText("");
 
         // display the current question number in the mQuestionNumberTextView
-        mQuestionNumberTextView.setText("Question {mCorrectGuesses} of {10}");
+        mQuestionNumberTextView
+                .setText(getResources().getString(R.string.question, (mCorrectGuesses + 1) , STUDENTS_IN_QUIZ));
 
         // use asset manager to load the next image from the assets folder
         AssetManager am = getAssets();
@@ -161,14 +215,14 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < mButtons.length; i++) {
             mButtons[i].setEnabled(true);
 
-            // TODO: Implement this by using the settings we configure
-            mButtons[i].setText(mAllStudentsList.get(i).getName());
+            // DONE: Implement this by using the settings we configure
+            mButtons[i].setText(getStringFromQuizType(mAllStudentsList.get(i)));
         }
 
         // after the loop, randomly replace one of the 4 buttons with the text of the correct
         // answer type
-        // TODO: Implement this LINE
-        mButtons[rng.nextInt(mButtons.length)].setText(mCorrectStudent.getName());
+        // DONE: Implement this LINE
+        mButtons[rng.nextInt(mButtons.length)].setText(getStringFromQuizType(mCorrectStudent));
     }
 
     public void makeGuess(View v) {
@@ -178,8 +232,8 @@ public class MainActivity extends AppCompatActivity {
         String guessedText = clickedButton.getText().toString();
 
         // if the guess matches the countries correct component, incremnt correct guesses
-        // TODO: IMPLEMENT THIS LINE
-        if (guessedText.equalsIgnoreCase(mCorrectStudent.getName())) {
+        // DONE: IMPLEMENT THIS LINE
+        if (guessedText.equalsIgnoreCase(getStringFromQuizType(mCorrectStudent))) {
             mCorrectGuesses++;
 
             // but the game isnt over yet
@@ -191,8 +245,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // change the answer text to correct answer
                 // make the text green
-                // TODO: implement this line
-                mAnswerTextView.setText(mCorrectStudent.getName());
+                // DONE: implement this line
+                mAnswerTextView.setText(getStringFromQuizType(mCorrectStudent));
                 mAnswerTextView.setTextColor(getResources().getColor(R.color.correct_answer));
 
                 // call load next flag
@@ -223,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // incorrect guess. disable the button
             clickedButton.setEnabled(false);
-            mAnswerTextView.setText("Incorrect!");
+            mAnswerTextView.setText(R.string.incorrect_answer);
             mAnswerTextView.setTextColor(getResources().getColor(R.color.incorrect_answer));
         }
     } // end of method
